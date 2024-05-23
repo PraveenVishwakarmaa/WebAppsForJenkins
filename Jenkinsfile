@@ -4,15 +4,22 @@ pipeline {
         maven "3.9.6"
     }
     stages {
+        stage('Git CheckOut') {
+            steps {
+               checkout([$class: 'GitSCM', branches:[[name: '*/dragon']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/logicopslab/rock-paper-scissors.git']]])
+            }
+        }
         stage('Clean and Install') {
             steps {
                bat 'mvn clean install'
             }
-        }
-        stage('Package') {
-            steps {
-               bat 'mvn package'
-            }
         } 
+        stage('Code Quality'){
+            steps{
+                withSonarQubeEnv('SonarQube Server'){
+                    bat 'mvn sonar:sonar
+                }
+            }
+        }
     }
 }
